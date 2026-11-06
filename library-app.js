@@ -3,7 +3,17 @@ const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g
 let items=[],demo=false,editing=null;let posterCache={};try{posterCache=JSON.parse(localStorage.getItem("sebs-poster-cache-v3")||"{}")}catch{};let posterQueueRunning=false;let code=sessionStorage.getItem('sebs-code')||'';
 const CATALOG_CORRECTIONS={"seed-19":{"title":"Stuck in Love","kind":"Película","release_year":2012},"seed-20":{"title":"Tiempo de pagar","kind":"Película","release_year":2024},"seed-17":{"title":"No Other Choice","kind":"Película","release_year":2025},"seed-33":{"title":"Obsession","kind":"Película","release_year":2026},"seed-34":{"title":"Primetime","kind":"Película","release_year":2026},"seed-38":{"title":"Bestia","kind":"Película","release_year":2021,"director":"Hugo Covarrubias"},"seed-45":{"title":"Monsters: The Lyle and Erik Menendez Story","kind":"Serie","release_year":2024},"seed-53":{"title":"Scott Pilgrim vs. the World","kind":"Película","release_year":2010},"seed-21":{"title":"The Drama","kind":"Película","release_year":2026},"seed-32":{"title":"Por ahora","kind":"Serie","release_year":2013,"director":"Malena Pichot"}};
 function correctCatalog(data){return data.map(x=>{const patch=CATALOG_CORRECTIONS[x.id];return patch?{...x,...patch}:x})}
-function readDemo(){let data;try{data=JSON.parse(localStorage.getItem('sebs-demo-library'))||'null')||structuredClone(seed)}catch{data=structuredClone(seed)}return correctCatalog(data)}
+
+function readDemo(){
+  let data;
+  try {
+    data = JSON.parse(localStorage.getItem('sebs-demo-library') || 'null') || structuredClone(seed);
+  } catch {
+    data = structuredClone(seed);
+  }
+  return correctCatalog(data);
+}
+
 function saveDemo(){localStorage.setItem('sebs-demo-library',JSON.stringify(items))}
 async function load(){try{const r=await fetch('/api/library');if(!r.ok)throw Error('No hay conexión con Supabase');const d=await r.json();items=correctCatalog(d.items||[]);demo=false;}catch{items=readDemo();demo=true;}render();loadPosters()}
 function posterKey(x){return [x.title,x.kind,x.release_year||''].join('|')}

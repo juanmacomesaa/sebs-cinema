@@ -22,10 +22,10 @@ export default async function handler(req, res) {
       ]);
       const normalize = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
       const watched = new Set(watchedRows.map(x => canonical(x.title)));
-      const allowed = new Set([]);
+      const allowed = new Set(["her","grand budapest hotel","whiplash","la la land","nine queens","godfather","the apartment","florida project","uncut gems","everything everywhere","amelie","sing street","scott pilgrim","truman show","perfect days","past lives","worst person in the world","aftersun","holdovers","little miss sunshine","lobster","the menu","parasite","secret in their eyes","machuca","wolf house","beast","memoir of a snail","mary and max","fantastic mr fox","isle of dogs","princess kaguya","spirited away","mitchells machines","paddington 2","palm springs","about time","when harry met sally","fleabag","barry","the bear","severance","ted lasso","the studio","los simuladores","okupas","the rehearsal"]);
       const movies = allMovies.filter(movie => {
         const key = canonical(movie.title);
-        return key !== 'pelicula de prueba' && !watched.has(key);
+        return allowed.has(key) && !watched.has(key);
       });
       const visibleIds = new Set(movies.map(movie => String(movie.id)));
       const myVotes = votes.filter(v => v.member === member && visibleIds.has(String(v.movie_id)));

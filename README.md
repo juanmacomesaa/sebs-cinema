@@ -10,3 +10,4 @@ Esta versión agrega pósteres oficiales a la Cinemateca usando la API TMDB desd
 4. El commit a `main` inicia un nuevo despliegue automáticamente. Verificar `https://sebs-cinema.vercel.app/api/tmdb?title=Fleabag&kind=Serie` (no muestra la clave), luego abrir la Cinemateca y esperar a que carguen los pósteres.
 
 Los títulos ambiguos pueden quedar sin póster antes que mostrar uno incorrecto. No hay base de datos compartida hasta configurar Supabase. La API de TMDB requiere atribución y respeto de sus condiciones.
+Prueba de conexión con Supabase — 06/11/2026.

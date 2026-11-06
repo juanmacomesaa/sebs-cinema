@@ -17,8 +17,11 @@ if(stills.length<5)return res.status(200).json({day,index,total:300,available:fa
 const unique=[...new Map(stills.map(x=>[x.file_path,x])).values()];
 const ranked=unique.sort((a,b)=>(a.vote_count||0)-(b.vote_count||0));
 const chosen=[...ranked.slice(0,3),...ranked.slice(-2)].filter((x,i,arr)=>arr.findIndex(y=>y.file_path===x.file_path)===i);
-const film={id:candidate.id,title:candidate.title,originalTitle:candidate.original_title,year:(candidate.release_date||'').slice(0,4)};
-const payload={day,index,total:300,available:true,frames:chosen.map(x=>'https://image.tmdb.org/t/p/w1280'+x.file_path),film:film};
+const film={title:candidate.title,originalTitle:candidate.original_title,year:(candidate.release_date||'').slice(0,4)};
+const clean=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const guess=String(req.query.guess||'').slice(0,120);
+if(guess)return res.status(200).json({correct:clean(guess)===clean(film.title)||clean(guess)===clean(film.originalTitle),answer:film.title,year:film.year});
+const payload={day,index,total:300,available:true,frames:chosen.map(x=>'https://image.tmdb.org/t/p/w1280'+x.file_path)};
 res.setHeader('Cache-Control','s-maxage=3600, stale-while-revalidate=3600');
 return res.status(200).json(payload);
 }catch(e){return res.status(502).json({error:'No pudimos cargar los fotogramas hoy.'})}

@@ -4,7 +4,7 @@ if(root){
 const $=id=>document.getElementById(id);
 const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const pick=items=>items[Math.floor(Math.random()*items.length)];
-let current=null,secret=null,tries=0,used=new Set();
+let current=null,secret=null,tries=0,used=new Set(),filmHistory=[];
 const saved=()=>{try{return JSON.parse(localStorage.getItem('sebs-torre-used')||'[]')}catch{return []}};
 function choose(){let available=TORRE_CATEGORIES.filter(c=>!used.has(c.id));if(!available.length){used.clear();available=TORRE_CATEGORIES}const item=pick(available);used.add(item.id);try{localStorage.setItem('sebs-torre-used',JSON.stringify([...used]))}catch{}return item}
 used=new Set(saved());

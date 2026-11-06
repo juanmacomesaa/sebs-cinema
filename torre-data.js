@@ -55,7 +55,22 @@ const extras=[
 ['Películas con fantasmas','Personajes',['Ghost','The Sixth Sense','Beetlejuice'],['fantasmas']]
 ];
 extras.forEach(([label,family,examples,aliases])=>add(label,family,'Media',examples,aliases));
-export const TORRE_CATEGORIES=categories;
+// Duel: a deliberately curated, balanced 300-category deck. No arbitrary crosses,
+// obscure word-count trivia, cities, or pre-2010 single-year prompts.
+const curated=[];
+const take=(family,count,condition=()=>true)=>{for(const entry of categories){if(curated.filter(x=>x.family===family).length>=count)break;if(entry.family===family&&condition(entry)&&!curated.includes(entry))curated.push(entry)}};
+take('Reparto',60);
+take('Dirección',35);
+take('Años',17);
+take('Géneros',20,c=>c.label.startsWith('Películas del género '));
+take('Lugares',22);
+take('Tramas',41);
+take('Títulos',60,c=>c.label.startsWith('Películas que tienen la palabra «'));
+take('Títulos',75,c=>c.label.startsWith('Películas cuyo título empieza con '));
+for(const item of categories.filter(c=>c.examples.length>=3)){if(!curated.includes(item))curated.push(item)}
+// If a family has fewer entries than its quota, fill with other straightforward prompts.
+for(const item of categories.filter(c=>['Reparto','Dirección','Géneros','Tramas','Lugares'].includes(c.family)&&!c.label.includes('mezclan '))){if(curated.length>=300)break;if(!curated.includes(item))curated.push(item)}
+export const TORRE_CATEGORIES=curated.slice(0,300);
 // Secret mode uses only categories objectively checkable against TMDB movie metadata.
 export const TORRE_SECRET=categories.filter(c=>c.family==='Reparto'||c.family==='Dirección'||c.family==='Años'||c.family==='Géneros'&&/^Películas del género /.test(c.label)||c.family==='Títulos'&&(/tienen la palabra/.test(c.label)||/título contiene un número/.test(c.label)||/título empieza con/.test(c.label)));
 

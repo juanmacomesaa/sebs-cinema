@@ -3,6 +3,47 @@ const env = process.env;
 const base = () => { if(!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Falta configurar Supabase en Vercel'); return env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/library'; };
 const headers = () => ({apikey:env.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_ROLE_KEY,'Content-Type':'application/json'});
 export async function db(path='',options={}) { const r=await fetch(base()+path,{...options,headers:{...headers(),...(options.headers||{})}}); const body=await r.text();let data;try{data=body?JSON.parse(body):null}catch{data=body}if(!r.ok)throw new Error(typeof data==='object'?(data.message||data.error||'Error de base de datos'):'Error de base de datos');return data; }
+
+export async function affinityDb(table, path = '', options = {}) {
+  if (!['affinity_movies', 'affinity_votes'].includes(table)) {
+    throw new Error('Tabla no permitida');
+  }
+
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) {
+    throw new Error('Falta configurar Supabase');
+  }
+
+  const response = await fetch(
+    url.replace(/\/$/, '') + '/rest/v1/' + table + path,
+    {
+      ...options,
+      headers: {
+        apikey: key,
+        Authorization: 'Bearer ' + key,
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      }
+    }
+  );
+
+  const body = await response.text();
+  let data;
+
+  try {
+    data = body ? JSON.parse(body) : null;
+  } catch {
+    data = body;
+  }
+
+  if (!response.ok) {
+    throw new Error('Error al consultar Afinidades');
+  }
+
+  return data;
+}
 export function member(req){ const provided=String(req.headers['x-sebs-code']||'');const key=env.SEBS_JUANMA_CODE;if(!key||!provided)return null;const a=Buffer.from(provided),b=Buffer.from(key);return a.length===b.length&&timingSafeEqual(a,b)?'Juanma':null; }
 export function send(res,status,obj){res.status(status).json(obj)}
 export function validate(b){const title=String(b.title||'').trim();if(!title||title.length>250)throw new Error('Título inválido');const kind=b.kind==='Serie'?'Serie':'Película';const status=['Completada','Al día','En curso'].includes(b.status)?b.status:'Completada';const rating=x=>{if(x===''||x===null||x===undefined)return null;const n=Number(x);if(!Number.isFinite(n)||n<0||n>10)throw new Error('Las notas deben estar entre 0 y 10');return Math.round(n*100)/100};const juanma_rating=rating(b.juanma_rating),pouk_rating=rating(b.pouk_rating);let shared_rating=rating(b.shared_rating);if(juanma_rating!==null&&pouk_rating!==null)shared_rating=Math.round((juanma_rating+pouk_rating)*50)/100;const year=b.release_year===''||b.release_year==null?null:Number(b.release_year);if(year!==null&&(!Number.isInteger(year)||year<1888||year>2100))throw new Error('Año inválido');const watched_on=b.watched_on||null;if(watched_on&&!/^\d{4}-\d{2}-\d{2}$/.test(watched_on))throw new Error('Fecha inválida');return {title,kind,status,director:String(b.director||'').slice(0,200)||null,release_year:year,shared_rating,juanma_rating,pouk_rating,watched_on,notes:String(b.notes||'').slice(0,1000)||null};}

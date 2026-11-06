@@ -19,6 +19,7 @@ words.forEach(w=>{add('Películas que tienen la palabra «'+w+'» en el título'
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{add('Películas cuyo título empieza con '+l,'Títulos');add('Películas cuyo título original empieza con '+l,'Títulos','Difícil');add('Películas con un personaje cuyo nombre empieza con '+l,'Personajes','Difícil')});
 for(let n=1;n<=40;n++){add('Películas con exactamente '+n+' palabras en el título','Títulos','Difícil');add('Películas con un número '+n+' en el título','Títulos','Difícil')}
 for(let n=1;n<=30;n++)add('Películas con al menos '+n+' personajes importantes','Personajes','Difícil');
+for(const g of genres)for(const p of places.slice(0,20))add('Películas del género '+g+' ambientadas en '+p,'Cruces','Experto');
 const extras=[
 ['Películas cuyo título contiene un número','Títulos',['Se7en','12 Angry Men','2001: A Space Odyssey'],['número en el título','numero','numeros']],
 ['Películas con viajes en el tiempo','Tramas',['Back to the Future','About Time','Predestination'],['viajes temporales','viaje en el tiempo']],

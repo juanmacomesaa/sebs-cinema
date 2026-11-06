@@ -261,7 +261,7 @@ export default async function handler(req,res){
     rows.push({tmdb_id:best.id,title:best.title||best.name,release_year:Number((best.release_date||best.first_air_date||'').slice(0,4))||null,poster_path:best.poster_path,overview:best.overview||'',recommendation_reason:reason});
    }catch{failures++}
   }}
-  await Promise.all(Array.from({length:5},worker));
+  await Promise.all(Array.from({length:12},worker));
   if(rows.length)await affinityDb('affinity_movies','',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(rows)});
   return send(res,200,{ok:true,added:rows.length,skipped:existing.length,excludedWatched:uniquePicks.length-notWatched.length,notFound:failures,total:existing.length+rows.length});
  }catch(error){console.error('Afinidades catalog seed:',error);return send(res,500,{error:error.message||'No se pudo cargar el catálogo.'})}

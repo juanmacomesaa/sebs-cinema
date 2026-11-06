@@ -5,7 +5,7 @@ const canonical = s => TITLE_ALIASES[normalize(s)] || normalize(s);
 
 function identify(req) {
   const member = String(req.headers['x-sebs-affinity-member'] || req.query?.member || '');
-  return ['Juanma', 'Pouk'].includes(member) ? member : null;
+  return ['Juanma', 'Yeni', 'Pouk'].includes(member) ? (member === 'Yeni' ? 'Pouk' : member) : null;
 }
 
 export default async function handler(req, res) {

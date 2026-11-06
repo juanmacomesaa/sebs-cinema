@@ -7,19 +7,21 @@ const places=['Nueva York','París','Londres','Los Ángeles','Tokio','Roma','Bue
 const themes=['una amistad central','un vínculo entre hermanos','un romance imposible','un triángulo amoroso','un robo','una investigación policial','un asesinato','un viaje en el tiempo','una inteligencia artificial','una identidad falsa','una familia disfuncional','una relación entre padres e hijos','una venganza','una desaparición','un secuestro','una catástrofe','una invasión extraterrestre','un animal importante','una mascota','una banda musical','un artista','una enfermedad','un personaje que cambia de ciudad','una historia de crecimiento personal','una amistad entre generaciones','una conspiración','una competición deportiva','una crisis de pareja','una historia de supervivencia','una celebración','una traición','un secreto familiar','un personaje que escribe','un personaje que cocina','un personaje que enseña','un personaje que conduce','un personaje que canta','un personaje que baila','un personaje que pinta','un personaje que actúa','un personaje que viaja'];
 const words=['amor','muerte','vida','noche','día','hombre','mujer','niño','niña','casa','ciudad','mundo','tiempo','último','primero','rey','reina','guerra','paz','familia','corazón','secreto','sueño','historia','juego','estrella','luna','sol','perro','gato','agua','fuego','rojo','negro','blanco','azul','verde','oro','gran','pequeño','dos','tres','cuatro','cinco','siete','diez','uno','mil','hotel','calle','viaje','tren','verano','invierno','primavera','otoño','fantasma','monstruo','doctor','profesor','amigo','amiga','padre','madre','hermano','hermana','hijo','hija','chica','chico','última','primer','nuevo','viejo','feliz','triste','oscuro','largo','corto','mar','tierra','cielo','puerta','ventana','habitación','retrato','memoria','recuerdo','silencio','voz','música','canción','baile','película','cine','camino','destino','planeta','animal','isla','bosque','nieve','lluvia','viento','flor'];
 const categories=[];
+const famousActors=new Set(actors.slice(0,65).concat(['Ricardo Darín','Guillermo Francella','Penélope Cruz','Javier Bardem','Antonio Banderas','Tom Cruise','Will Smith']));
 const add=(label,family,difficulty='Media',examples=[],aliases=[])=>categories.push({id:'torre-'+categories.length,label,family,difficulty,examples,aliases});
-actors.forEach(a=>add('Películas en las que actúa '+a,'Reparto'));
+actors.filter(a=>famousActors.has(a)).forEach(a=>add('Películas en las que actúa '+a,'Reparto'));
+
 directors.forEach(d=>add('Películas dirigidas por '+d,'Dirección'));
-for(let year=1940;year<=2026;year++)add('Películas estrenadas en '+year,'Años','Difícil');
+for(let year=2010;year<=2026;year++)add('Películas estrenadas en '+year,'Años','Difícil');
 for(let decade=1920;decade<=2020;decade+=10)add('Películas estrenadas en los años '+decade,'Épocas');
 genres.forEach(g=>{add('Películas del género '+g,'Géneros');add('Películas que mezclan '+g+' y drama','Géneros','Difícil');add('Películas que mezclan '+g+' y comedia','Géneros','Difícil')});
-places.forEach(p=>add('Películas ambientadas principalmente en '+p,'Lugares'));
+places.filter(p=>!['Nueva York','París','Londres','Los Ángeles','Tokio','Roma','Buenos Aires','Santiago de Chile','Berlín','México','Chicago','San Francisco','Las Vegas'].includes(p)).forEach(p=>add('Películas ambientadas principalmente en '+p,'Lugares'));
 themes.forEach(t=>add('Películas con '+t,'Tramas'));
 words.forEach(w=>{add('Películas que tienen la palabra «'+w+'» en el título','Títulos');add('Películas cuyo título original contiene «'+w+'»','Títulos','Difícil')});
 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{add('Películas cuyo título empieza con '+l,'Títulos');add('Películas cuyo título original empieza con '+l,'Títulos','Difícil');add('Películas con un personaje cuyo nombre empieza con '+l,'Personajes','Difícil')});
 for(let n=1;n<=40;n++){add('Películas con exactamente '+n+' palabras en el título','Títulos','Difícil');add('Películas con un número '+n+' en el título','Títulos','Difícil')}
 for(let n=1;n<=30;n++)add('Películas con al menos '+n+' personajes importantes','Personajes','Difícil');
-for(const g of genres)for(const p of places.slice(0,20))add('Películas del género '+g+' ambientadas en '+p,'Cruces','Experto');
+for(const g of genres)for(const p of places.slice(13,33))add('Películas del género '+g+' ambientadas en '+p,'Cruces','Experto');
 const extras=[
 ['Películas cuyo título contiene un número','Títulos',['Se7en','12 Angry Men','2001: A Space Odyssey'],['número en el título','numero','numeros']],
 ['Películas con viajes en el tiempo','Tramas',['Back to the Future','About Time','Predestination'],['viajes temporales','viaje en el tiempo']],
@@ -54,4 +56,6 @@ const extras=[
 ];
 extras.forEach(([label,family,examples,aliases])=>add(label,family,'Media',examples,aliases));
 export const TORRE_CATEGORIES=categories;
-export const TORRE_SECRET=categories.filter(c=>c.examples.length>=3);
+// Secret mode uses only categories objectively checkable against TMDB movie metadata.
+export const TORRE_SECRET=categories.filter(c=>c.family==='Reparto'||c.family==='Dirección'||c.family==='Años'||c.family==='Géneros'&&/^Películas del género /.test(c.label)||c.family==='Títulos'&&(/tienen la palabra/.test(c.label)||/título contiene un número/.test(c.label)||/título empieza con/.test(c.label)));
+

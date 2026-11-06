@@ -1,4 +1,4 @@
-import { affinityDb, send } from './_shared.js';
+import { affinityDb, db, send } from './_shared.js';
 import { timingSafeEqual } from 'node:crypto';
 
 const picks = [
@@ -60,9 +60,14 @@ export default async function handler(req,res){
  const key=process.env.TMDB_READ_TOKEN,apiKey=process.env.TMDB_API_KEY;
  if(!key&&!apiKey)return send(res,503,{error:'Falta TMDB_READ_TOKEN o TMDB_API_KEY en Vercel.'});
  try{
-  const existing=await affinityDb('affinity_movies','?select=tmdb_id');
+  // La Cinemateca es la fuente de verdad de lo que ya vimos.
+  const watchedRows=await db('?select=title,kind&limit=2000');
+  const normalize=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const watched=new Set(watchedRows.map(x=>normalize(x.title)));
+  const notWatched=picks.filter(x=>!watched.has(normalize(x[0])));
+  const existing=await affinityDb('affinity_movies','?select=tmdb_id,title');
   const known=new Set(existing.map(x=>String(x.tmdb_id)));
-  const pending=picks.filter(x=>!known.has(x[0]));
+  const pending=notWatched.filter(x=>!known.has(x[0]));
   const rows=[];let failures=0;
   let cursor=0;
   async function worker(){while(cursor<pending.length){
@@ -82,6 +87,6 @@ export default async function handler(req,res){
   }}
   await Promise.all(Array.from({length:5},worker));
   if(rows.length)await affinityDb('affinity_movies','',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(rows)});
-  return send(res,200,{ok:true,added:rows.length,skipped:existing.length,notFound:failures,total:existing.length+rows.length});
+  return send(res,200,{ok:true,added:rows.length,skipped:existing.length,excludedWatched:picks.length-notWatched.length,notFound:failures,total:existing.length+rows.length});
  }catch(error){console.error('Afinidades catalog seed:',error);return send(res,500,{error:error.message||'No se pudo cargar el catálogo.'})}
 }

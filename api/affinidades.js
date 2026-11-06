@@ -1,4 +1,4 @@
-import { affinityDb, send } from './_shared.js';
+import { affinityDb, db, send } from './_shared.js';
 
 function identify(req) {
   const member = String(req.headers['x-sebs-affinity-member'] || req.query?.member || '');
@@ -12,9 +12,16 @@ export default async function handler(req, res) {
     if (!member) return send(res, 400, { error: 'Elegí el perfil Juanma o Pouk para continuar.' });
 
     if (req.method === 'GET') {
-      const movies = await affinityDb('affinity_movies', '?select=*&order=id.asc');
-      const votes = await affinityDb('affinity_votes', '?select=movie_id,member,vote');
-      const myVotes = votes.filter(v => v.member === member);
+      const [allMovies, votes, watchedRows] = await Promise.all([
+        affinityDb('affinity_movies', '?select=*&order=id.asc'),
+        affinityDb('affinity_votes', '?select=movie_id,member,vote'),
+        db('?select=title&limit=2000')
+      ]);
+      const normalize = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      const watched = new Set(watchedRows.map(x => normalize(x.title)));
+      const movies = allMovies.filter(movie => !watched.has(normalize(movie.title)));
+      const visibleIds = new Set(movies.map(movie => String(movie.id)));
+      const myVotes = votes.filter(v => v.member === member && visibleIds.has(String(v.movie_id)));
       const matches = movies.filter(movie =>
         votes.some(v => String(v.movie_id) === String(movie.id) && v.member === 'Juanma' && v.vote === 'like') &&
         votes.some(v => String(v.movie_id) === String(movie.id) && v.member === 'Pouk' && v.vote === 'like')

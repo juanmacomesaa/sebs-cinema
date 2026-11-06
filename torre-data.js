@@ -55,21 +55,42 @@ const extras=[
 ['Películas con fantasmas','Personajes',['Ghost','The Sixth Sense','Beetlejuice'],['fantasmas']]
 ];
 extras.forEach(([label,family,examples,aliases])=>add(label,family,'Media',examples,aliases));
-// Duel: a deliberately curated, balanced 300-category deck. No arbitrary crosses,
-// obscure word-count trivia, cities, or pre-2010 single-year prompts.
+// Duel deck: curated, understandable categories; never pad with arbitrary prompts.
 const curated=[];
-const take=(family,count,condition=()=>true)=>{for(const entry of categories){if(curated.filter(x=>x.family===family).length>=count)break;if(entry.family===family&&condition(entry)&&!curated.includes(entry))curated.push(entry)}};
-take('Reparto',60);
-take('Dirección',35);
-take('Años',17);
-take('Géneros',20,c=>c.label.startsWith('Películas del género '));
-take('Lugares',22);
-take('Tramas',41);
-take('Títulos',60,c=>c.label.startsWith('Películas que tienen la palabra «'));
-take('Títulos',75,c=>c.label.startsWith('Películas cuyo título empieza con '));
-for(const item of categories.filter(c=>c.examples.length>=3)){if(!curated.includes(item))curated.push(item)}
-// If a family has fewer entries than its quota, fill with other straightforward prompts.
-for(const item of categories.filter(c=>['Reparto','Dirección','Géneros','Tramas','Lugares'].includes(c.family)&&!c.label.includes('mezclan '))){if(curated.length>=300)break;if(!curated.includes(item))curated.push(item)}
+const include=(entries,limit)=>{for(const entry of entries.slice(0,limit))if(!curated.includes(entry))curated.push(entry)};
+const by=(family,condition=()=>true)=>categories.filter(c=>c.family===family&&condition(c));
+include(by('Reparto'),60);
+include(by('Dirección',c=>['Christopher Nolan','Wes Anderson','Peter Jackson'].some(name=>c.label.endsWith(name))),3);
+include(by('Años'),17);
+const familiarGenres=new Set(['drama','comedia','terror','romance','acción','ciencia ficción','fantasía','thriller','animación','musical','crimen','aventuras']);
+include(by('Géneros',c=>familiarGenres.has(c.label.replace('Películas del género ',''))),12);
+include(by('Tramas'),41);
+include(by('Títulos',c=>c.label.startsWith('Películas que tienen la palabra «')),100);
+include(by('Títulos',c=>/^Películas cuyo título empieza con [A-Z]$/.test(c.label)),26);
+const special=[
+'Películas que transcurren durante un solo día',
+'Películas donde la música es fundamental para la historia',
+'Películas que rompen la cuarta pared',
+'Películas con una narración no lineal',
+'Películas donde la identidad del protagonista es un misterio',
+'Películas sobre hacer cine',
+'Películas con un narrador poco confiable',
+'Películas que cuentan la misma historia desde distintas perspectivas',
+'Películas con un final abierto',
+'Películas con un protagonista que vive una doble vida',
+'Películas con una historia dentro de otra historia',
+'Películas donde se repite el mismo día',
+'Películas con personajes que intercambian cuerpos',
+'Películas que tienen una película dentro de la película',
+'Películas con una escena de juicio decisiva',
+'Películas donde el protagonista habla directamente a cámara',
+'Películas donde dos desconocidos pasan el día juntos',
+'Películas con un personaje que descubre un secreto sobre su identidad',
+'Películas donde un objeto cambia de dueño varias veces',
+'Películas donde el protagonista vuelve a su pueblo natal'
+];
+special.forEach(label=>curated.push({id:'especial-'+curated.length,label,family:'Conexiones especiales',difficulty:'Media',examples:[],aliases:[]}));
+include(categories.filter(c=>c.examples.length>=3&&!curated.includes(c)&&!c.label.includes('ambientadas en ')&&!c.label.includes('transcurren en un hotel')&&!c.label.includes('isla importante')&&!c.label.includes('tren importante')),300-curated.length);
 export const TORRE_CATEGORIES=curated.slice(0,300);
 // Secret mode uses only categories objectively checkable against TMDB movie metadata.
 export const TORRE_SECRET=categories.filter(c=>c.family==='Reparto'||c.family==='Dirección'||c.family==='Años'||c.family==='Géneros'&&/^Películas del género /.test(c.label)||c.family==='Títulos'&&(/tienen la palabra/.test(c.label)||/título contiene un número/.test(c.label)||/título empieza con/.test(c.label)));

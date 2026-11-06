@@ -20,5 +20,6 @@ $('torre-next').addEventListener('click',duel);
 $('torre-secret-next').addEventListener('click',secretStart);
 $('torre-secret-guess').addEventListener('click',guess);
 $('torre-secret-answer').addEventListener('keydown',e=>{if(e.key==='Enter')guess()});
+$('torre-film-check').onclick=checkFilm;
 mode('duel');
 }

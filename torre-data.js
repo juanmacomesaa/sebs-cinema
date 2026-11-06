@@ -93,5 +93,5 @@ special.forEach(label=>curated.push({id:'especial-'+curated.length,label,family:
 include(categories.filter(c=>c.examples.length>=3&&!curated.includes(c)&&!c.label.includes('ambientadas en ')&&!c.label.includes('transcurren en un hotel')&&!c.label.includes('isla importante')&&!c.label.includes('tren importante')),300-curated.length);
 export const TORRE_CATEGORIES=curated.slice(0,300);
 // Secret mode uses only categories objectively checkable against TMDB movie metadata.
-export const TORRE_SECRET=categories.filter(c=>c.family==='Reparto'||c.family==='Dirección'||c.family==='Años'||c.family==='Géneros'&&/^Películas del género /.test(c.label)||c.family==='Títulos'&&(/tienen la palabra/.test(c.label)||/título contiene un número/.test(c.label)||/título empieza con/.test(c.label)));
+export const TORRE_SECRET=categories.filter(c=>c.family==='Reparto'||c.family==='Dirección'&&['Christopher Nolan','Wes Anderson','Peter Jackson'].some(name=>c.label.endsWith(name))||c.family==='Años'||c.family==='Géneros'&&familiarGenres.has(c.label.replace('Películas del género ',''))||c.family==='Títulos'&&(/tienen la palabra/.test(c.label)||/título contiene un número/.test(c.label)||/título empieza con/.test(c.label)));
 

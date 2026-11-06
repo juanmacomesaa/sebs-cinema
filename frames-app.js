@@ -27,13 +27,13 @@ const r=await fetch('/api/frames?guess='+encodeURIComponent(title));
 const result=await r.json();
 if(!r.ok)throw Error(result.error||'Error de consulta');
 if(result.correct){marks.push('🟩');answer=result.answer;done=true}
-else{marks.push('⬛');if(step>=4){answer=result.answer;done=true}else step++}
+else{marks.push('⬛');if(step>=4){answer=(await (await fetch('/api/frames?reveal=1')).json()).answer;done=true}else step++}
 $('frames-guess').value='';save();render();
 if(!done)$('frames-feedback').textContent='No es esa. Se reveló otro fotograma.';
 }catch(e){$('frames-feedback').textContent='No se pudo comprobar la respuesta. Probá de nuevo.'}
 finally{if(!done)$('frames-submit').disabled=false}
 }
-function skip(){if(done||!puzzle?.available)return;marks.push('⬜');if(step>=4){done=true;answer='la película misteriosa';$('frames-feedback').textContent='Terminaste los cinco fotogramas.'}else step++;save();render()}
+async function skip(){if(done||!puzzle?.available)return;marks.push('⬜');if(step>=4){done=true;try{answer=(await (await fetch('/api/frames?reveal=1')).json()).answer}catch{answer='la película misteriosa'}$('frames-feedback').textContent='Terminaste los cinco fotogramas.'}else step++;save();render()}
 $('frames-submit').onclick=finishGuess;
 $('frames-skip').onclick=skip;
 $('frames-guess').addEventListener('keydown',e=>{if(e.key==='Enter')finishGuess()});

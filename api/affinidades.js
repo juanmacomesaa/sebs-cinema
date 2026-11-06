@@ -1,4 +1,7 @@
 import { affinityDb, db, send } from './_shared.js';
+const TITLE_ALIASES = {"the grand budapest hotel":"grand budapest hotel","el gran hotel budapest":"grand budapest hotel","everything everywhere all at once":"everything everywhere","todo al mismo tiempo en todas partes":"everything everywhere","todo a la vez en todas partes":"everything everywhere","nine queens":"nine queens","nueve reinas":"nine queens","9 reinas":"nine queens","wishplash":"whiplash","whiplash":"whiplash","the godfather":"godfather","el padrino":"godfather","the florida project":"florida project","the florida proyect":"florida project","the secret in their eyes":"secret in their eyes","el secreto de sus ojos":"secret in their eyes","scott pilgrim vs the world":"scott pilgrim","scott pilgrim contra el mundo":"scott pilgrim","uncut gems":"uncut gems","diamantes en bruto":"uncut gems","amelie":"amelie","el show de truman":"truman show","the truman show":"truman show","the holdovers":"holdovers","los que se quedan":"holdovers","little miss sunshine":"little miss sunshine","pequena miss sunshine":"little miss sunshine","the lobster":"lobster","langosta":"lobster","the wolf house":"wolf house","la casa lobo":"wolf house","fantastic mr fox":"fantastic mr fox","fantastico sr fox":"fantastic mr fox","the tale of the princess kaguya":"princess kaguya","el cuento de la princesa kaguya":"princess kaguya","the mitchells vs the machines":"mitchells machines","los mitchell contra las maquinas":"mitchells machines","memoir of a snail":"memoir of a snail","memorias de un caracol":"memoir of a snail","severance":"severance","separacion":"severance","the rehearsal":"the rehearsal","los ensayos":"the rehearsal","when harry met sally":"when harry met sally","cuando harry encontro a sally":"when harry met sally","the worst person in the world":"worst person in the world","la peor persona del mundo":"worst person in the world"};
+const normalize = s => String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const canonical = s => TITLE_ALIASES[normalize(s)] || normalize(s);
 
 function identify(req) {
   const member = String(req.headers['x-sebs-affinity-member'] || req.query?.member || '');
@@ -18,8 +21,12 @@ export default async function handler(req, res) {
         db('?select=title&limit=2000')
       ]);
       const normalize = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-      const watched = new Set(watchedRows.map(x => normalize(x.title)));
-      const movies = allMovies.filter(movie => !watched.has(normalize(movie.title)));
+      const watched = new Set(watchedRows.map(x => canonical(x.title)));
+      const allowed = new Set([]);
+      const movies = allMovies.filter(movie => {
+        const key = canonical(movie.title);
+        return key !== 'pelicula de prueba' && !watched.has(key);
+      });
       const visibleIds = new Set(movies.map(movie => String(movie.id)));
       const myVotes = votes.filter(v => v.member === member && visibleIds.has(String(v.movie_id)));
       const matches = movies.filter(movie =>

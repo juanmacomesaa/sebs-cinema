@@ -196,7 +196,7 @@ setOpen(!mobile());toggle.addEventListener('click',()=>setOpen(!document.body.cl
 })();
 </script><script id="affinity-app-script">
 (()=>{const root=document.getElementById('afinidades');if(!root||root.dataset.initialized)return;root.dataset.initialized='1';
-const $=id=>document.getElementById(id);let profile=localStorage.getItem('sebs-affinity-profile')||'',movies=[],votes=[],matches=[],tab='discover',busy=false;
+const $=id=>document.getElementById(id);let profile=(localStorage.getItem('sebs-affinity-profile')==='Pouk'?'Yeni':localStorage.getItem('sebs-affinity-profile'))||'',movies=[],votes=[],matches=[],tab='discover',busy=false;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const voted=()=>new Set(votes.map(v=>String(v.movie_id)));
 const movieId=m=>String(m.id);

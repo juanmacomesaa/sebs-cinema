@@ -70,7 +70,8 @@ export default async function handler(req,res){
    try{
     const url=new URL('https://api.themoviedb.org/3/search/'+type);
     url.searchParams.set('query',title);url.searchParams.set('include_adult','false');url.searchParams.set('language','es-ES');
-    const response=await fetch(url,{headers:key?{Authorization:'Bearer '+key}:{},...(key?{}:{headers:{}})});
+    if(!key)url.searchParams.set('api_key',apiKey);
+    const response=await fetch(url,{headers:key?{Authorization:'Bearer '+key}:{}});
     if(!response.ok){failures++;continue}
     const data=await response.json();const results=(data.results||[]).filter(x=>x.poster_path);
     const normalized=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();

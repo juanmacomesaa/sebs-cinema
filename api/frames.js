@@ -20,7 +20,8 @@ const chosen=[...ranked.slice(0,3),...ranked.slice(-2)].filter((x,i,arr)=>arr.fi
 const film={title:candidate.title,originalTitle:candidate.original_title,year:(candidate.release_date||'').slice(0,4)};
 const clean=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const guess=String(req.query.guess||'').slice(0,120);
-if(guess)return res.status(200).json({correct:clean(guess)===clean(film.title)||clean(guess)===clean(film.originalTitle),answer:film.title,year:film.year});
+if(req.query.reveal==='1')return res.status(200).json({answer:film.title});
+if(guess){const correct=clean(guess)===clean(film.title)||clean(guess)===clean(film.originalTitle);return res.status(200).json({correct,answer:correct?film.title:null});}
 const payload={day,index,total:300,available:true,frames:chosen.map(x=>'https://image.tmdb.org/t/p/w1280'+x.file_path)};
 res.setHeader('Cache-Control','s-maxage=3600, stale-while-revalidate=3600');
 return res.status(200).json(payload);

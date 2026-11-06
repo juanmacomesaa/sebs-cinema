@@ -1,7 +1,7 @@
 import { affinityDb, send } from './_shared.js';
 
 function identify(req) {
-  const member = String(req.headers['x-sebs-affinity-member'] || '');
+  const member = String(req.headers['x-sebs-affinity-member'] || req.query?.member || '');
   return ['Juanma', 'Pouk'].includes(member) ? member : null;
 }
 

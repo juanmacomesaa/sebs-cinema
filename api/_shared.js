@@ -38,9 +38,12 @@ export async function affinityDb(table, path = '', options = {}) {
     data = body;
   }
 
-  if (!response.ok) {
-    throw new Error('Error al consultar Afinidades');
-  }
+  
+if (!response.ok) {
+  console.error('Supabase Afinidades:', response.status, data);
+  throw new Error('Error al consultar Afinidades');
+}
+
 
   return data;
 }

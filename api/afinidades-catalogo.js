@@ -1,6 +1,9 @@
 import { affinityDb, db, send } from './_shared.js';
 import { timingSafeEqual } from 'node:crypto';
 
+const TITLE_ALIASES = {"the grand budapest hotel":"grand budapest hotel","el gran hotel budapest":"grand budapest hotel","everything everywhere all at once":"everything everywhere","todo al mismo tiempo en todas partes":"everything everywhere","todo a la vez en todas partes":"everything everywhere","nine queens":"nine queens","nueve reinas":"nine queens","9 reinas":"nine queens","wishplash":"whiplash","whiplash":"whiplash","the godfather":"godfather","el padrino":"godfather","the florida project":"florida project","the florida proyect":"florida project","the secret in their eyes":"secret in their eyes","el secreto de sus ojos":"secret in their eyes","scott pilgrim vs the world":"scott pilgrim","scott pilgrim contra el mundo":"scott pilgrim","uncut gems":"uncut gems","diamantes en bruto":"uncut gems","amelie":"amelie","el show de truman":"truman show","the truman show":"truman show","the holdovers":"holdovers","los que se quedan":"holdovers","little miss sunshine":"little miss sunshine","pequena miss sunshine":"little miss sunshine","the lobster":"lobster","langosta":"lobster","the wolf house":"wolf house","la casa lobo":"wolf house","fantastic mr fox":"fantastic mr fox","fantastico sr fox":"fantastic mr fox","the tale of the princess kaguya":"princess kaguya","el cuento de la princesa kaguya":"princess kaguya","the mitchells vs the machines":"mitchells machines","los mitchell contra las maquinas":"mitchells machines","memoir of a snail":"memoir of a snail","memorias de un caracol":"memoir of a snail","severance":"severance","separacion":"severance","the rehearsal":"the rehearsal","los ensayos":"the rehearsal","when harry met sally":"when harry met sally","cuando harry encontro a sally":"when harry met sally","the worst person in the world":"worst person in the world","la peor persona del mundo":"worst person in the world"};
+const normalize = s => String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const canonical = s => TITLE_ALIASES[normalize(s)] || normalize(s);
 const picks = [
   ['Her','movie','Una historia íntima y sensible sobre vínculos, soledad y tecnología.'],
   ['The Grand Budapest Hotel','movie','Humor, composición visual y un universo cinematográfico muy reconocible.'],
@@ -63,8 +66,8 @@ export default async function handler(req,res){
   // La Cinemateca es la fuente de verdad de lo que ya vimos.
   const watchedRows=await db('?select=title,kind&limit=2000');
   const normalize=s=>String(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-  const watched=new Set(watchedRows.map(x=>normalize(x.title)));
-  const notWatched=picks.filter(x=>!watched.has(normalize(x[0])));
+  const watched=new Set(watchedRows.map(x=>canonical(x.title)));
+  const notWatched=picks.filter(x=>!watched.has(canonical(x[0])));
   const existing=await affinityDb('affinity_movies','?select=tmdb_id,title');
   const known=new Set(existing.map(x=>String(x.tmdb_id)));
   const pending=notWatched.filter(x=>!known.has(x[0]));
@@ -79,8 +82,8 @@ export default async function handler(req,res){
     const response=await fetch(url,{headers:key?{Authorization:'Bearer '+key}:{}});
     if(!response.ok){failures++;continue}
     const data=await response.json();const results=(data.results||[]).filter(x=>x.poster_path);
-    const normalized=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-    const best=results.find(x=>normalized(x.title||x.name)===normalized(title))||results[0];
+    const wanted=canonical(title);
+    const best=results.find(x=>canonical(x.title||x.name)===wanted);
     if(!best){failures++;continue}
     rows.push({tmdb_id:best.id,title:best.title||best.name,release_year:Number((best.release_date||best.first_air_date||'').slice(0,4))||null,poster_path:best.poster_path,overview:best.overview||'',recommendation_reason:reason});
    }catch{failures++}

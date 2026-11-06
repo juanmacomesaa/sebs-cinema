@@ -1,0 +1,7 @@
+SEB’S — Correcciones de 10 títulos
+
+Subí a la raíz de GitHub los archivos seed.json, seed.js y library-app.js, y la carpeta api (con tmdb.js).
+No borres el resto de archivos del repositorio.
+Se conservan notas y calificaciones; se corrigen títulos, tipo y año.
+La caché de pósteres pasa a v3 para volver a buscar las portadas.
+Nota: algunas obras pueden no estar indexadas en TMDB; no se garantiza póster en todos los casos.

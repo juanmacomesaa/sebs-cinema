@@ -13,7 +13,13 @@ const aliases={
  'monstruos: hermanos menendez':'Monsters: The Lyle and Erik Menendez Story',
  'scott pilgrim vs. los ex de la chica de sus sueños':'Scott Pilgrim vs. the World',
  'sudamerican rockers':'Sudamerican Rockers',
- 'tiempo de pagar':'Time to Pay',
+ 'tiempo de pagar':'Tiempo de pagar',
+ 'stuck in love':'Stuck in Love',
+ 'bestia':'Bestia',
+ 'por ahora':'Por ahora',
+ 'primetime':'Primetime',
+ 'obsession':'Obsession',
+ 'the drama':'The Drama',
 };
 const normalize=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const similarity=(a,b)=>{const A=new Set(normalize(a).split(' ')),B=new Set(normalize(b).split(' '));let n=0;for(const x of A)if(B.has(x))n++;return n/Math.max(A.size,B.size,1)};

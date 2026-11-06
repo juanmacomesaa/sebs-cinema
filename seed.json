@@ -208,7 +208,7 @@
     "id": "seed-16"
   },
   {
-    "title": "No Other Choise",
+    "title": "No Other Choice",
     "kind": "Película",
     "director": null,
     "release_year": 2025,
@@ -234,10 +234,10 @@
     "id": "seed-18"
   },
   {
-    "title": "Editando el amor",
+    "title": "Stuck in Love",
     "kind": "Película",
     "director": null,
-    "release_year": null,
+    "release_year": 2012,
     "status": "Completada",
     "shared_rating": null,
     "juanma_rating": null,
@@ -260,7 +260,7 @@
     "id": "seed-20"
   },
   {
-    "title": "Drama",
+    "title": "The Drama",
     "kind": "Película",
     "director": null,
     "release_year": 2026,
@@ -404,9 +404,9 @@
   },
   {
     "title": "Por ahora",
-    "kind": "Película",
-    "director": null,
-    "release_year": null,
+    "kind": "Serie",
+    "director": "Malena Pichot",
+    "release_year": 2013,
     "status": "Completada",
     "shared_rating": null,
     "juanma_rating": null,
@@ -416,10 +416,10 @@
     "id": "seed-32"
   },
   {
-    "title": "Obession",
+    "title": "Obsession",
     "kind": "Película",
     "director": null,
-    "release_year": null,
+    "release_year": 2026,
     "status": "Completada",
     "shared_rating": null,
     "juanma_rating": null,
@@ -430,7 +430,7 @@
   },
   {
     "title": "Primetime",
-    "kind": "Serie",
+    "kind": "Película",
     "director": null,
     "release_year": 2026,
     "status": "Completada",
@@ -481,9 +481,9 @@
     "id": "seed-37"
   },
   {
-    "title": "Beast",
+    "title": "Bestia",
     "kind": "Película",
-    "director": null,
+    "director": "Hugo Covarrubias",
     "release_year": 2021,
     "status": "Completada",
     "shared_rating": null,
@@ -572,10 +572,10 @@
     "id": "seed-44"
   },
   {
-    "title": "Monstruos: Hermanos Menendez",
+    "title": "Monsters: The Lyle and Erik Menendez Story",
     "kind": "Serie",
     "director": null,
-    "release_year": null,
+    "release_year": 2024,
     "status": "En curso",
     "shared_rating": null,
     "juanma_rating": null,
@@ -676,10 +676,10 @@
     "id": "seed-52"
   },
   {
-    "title": "Scott Pilgrim vs. los ex de la chica de sus sueños",
+    "title": "Scott Pilgrim vs. the World",
     "kind": "Película",
     "director": null,
-    "release_year": null,
+    "release_year": 2010,
     "status": "En curso",
     "shared_rating": null,
     "juanma_rating": null,

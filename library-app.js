@@ -1,20 +1,22 @@
 import {seed} from './seed.js';
 const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let items=[],demo=false,editing=null;let posterCache={};try{posterCache=JSON.parse(localStorage.getItem("sebs-poster-cache-v2")||"{}")}catch{};let posterQueueRunning=false;let code=sessionStorage.getItem('sebs-code')||'';
-function readDemo(){try{return JSON.parse(localStorage.getItem('sebs-demo-library'))||structuredClone(seed)}catch{return structuredClone(seed)}}
+let items=[],demo=false,editing=null;let posterCache={};try{posterCache=JSON.parse(localStorage.getItem("sebs-poster-cache-v3")||"{}")}catch{};let posterQueueRunning=false;let code=sessionStorage.getItem('sebs-code')||'';
+const CATALOG_CORRECTIONS={"seed-19":{"title":"Stuck in Love","kind":"Película","release_year":2012},"seed-20":{"title":"Tiempo de pagar","kind":"Película","release_year":2024},"seed-17":{"title":"No Other Choice","kind":"Película","release_year":2025},"seed-33":{"title":"Obsession","kind":"Película","release_year":2026},"seed-34":{"title":"Primetime","kind":"Película","release_year":2026},"seed-38":{"title":"Bestia","kind":"Película","release_year":2021,"director":"Hugo Covarrubias"},"seed-45":{"title":"Monsters: The Lyle and Erik Menendez Story","kind":"Serie","release_year":2024},"seed-53":{"title":"Scott Pilgrim vs. the World","kind":"Película","release_year":2010},"seed-21":{"title":"The Drama","kind":"Película","release_year":2026},"seed-32":{"title":"Por ahora","kind":"Serie","release_year":2013,"director":"Malena Pichot"}};
+function correctCatalog(data){return data.map(x=>{const patch=CATALOG_CORRECTIONS[x.id];return patch?{...x,...patch}:x})}
+function readDemo(){let data;try{data=JSON.parse(localStorage.getItem('sebs-demo-library'))||'null')||structuredClone(seed)}catch{data=structuredClone(seed)}return correctCatalog(data)}
 function saveDemo(){localStorage.setItem('sebs-demo-library',JSON.stringify(items))}
-async function load(){try{const r=await fetch('/api/library');if(!r.ok)throw Error('No hay conexión con Supabase');const d=await r.json();items=d.items||[];demo=false;}catch{items=readDemo();demo=true;}render();loadPosters()}
+async function load(){try{const r=await fetch('/api/library');if(!r.ok)throw Error('No hay conexión con Supabase');const d=await r.json();items=correctCatalog(d.items||[]);demo=false;}catch{items=readDemo();demo=true;}render();loadPosters()}
 function posterKey(x){return [x.title,x.kind,x.release_year||''].join('|')}
 async function loadPosters(){
  if(posterQueueRunning)return;posterQueueRunning=true;
  const queue=items.filter(x=>!posterCache[posterKey(x)]);
  let cursor=0;
  async function worker(){while(cursor<queue.length){const x=queue[cursor++],key=posterKey(x);
- try{const qs=new URLSearchParams({title:x.title,kind:x.kind||''});
+ try{const qs=new URLSearchParams({title:x.title,kind:x.kind||'',year:x.release_year||''});
  // Some sheet years are viewing dates or erroneous; do not use them as strict release filters.
  const r=await fetch('/api/tmdb?'+qs);if(!r.ok)continue;
  const data=await r.json();posterCache[key]=data;
- localStorage.setItem('sebs-poster-cache-v2',JSON.stringify(posterCache));
+ localStorage.setItem('sebs-poster-cache-v3',JSON.stringify(posterCache));
  if(data.poster){const card=[...document.querySelectorAll('[data-film-id]')].find(el=>el.dataset.filmId===String(x.id));
  if(card){const wrap=card.querySelector('.film-poster-wrap');if(wrap){const img=document.createElement('img');img.className='film-poster';img.src=data.poster;img.alt='Póster de '+x.title;img.loading='lazy';wrap.replaceChildren(img)}}}
  }catch{ /* transient failures are retried next visit */ }

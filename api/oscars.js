@@ -1,5 +1,20 @@
 const films=[
-['The Odyssey',2026],['La Bola Negra',2026],['Wild Horse Nine',2026],['Dune: Part Three',2026],['Project Hail Mary',2026],['The Invite',2026],['The Debut',2026],['Artificial',2026],['I Play Rocky',2026],['Fjord',2026],['You Can See Everything',2026],['Elsinore',2026],['Digger',2026],['Possible Love',2026],['All of a Sudden',2026],['Obsession',2026]
+["The Odyssey",2026],
+["La Bola Negra",2026],
+["Wild Horse Nine",2026],
+["You Can See Everything",2026],
+["Artificial",2026],
+["Project Hail Mary",2026],
+["Elsinore",2026],
+["The Invite",2026],
+["Dune: Part Three",2026],
+["Obsession",2026],
+["Club Kid",2026],
+["The Debut",2026],
+["All of a Sudden",2026],
+["Fjord",2026],
+["I Play Rocky",2026],
+["Digger",2026]
 ];
 export default async function handler(req,res){
 if(req.method!=='GET')return res.status(405).json({error:'Método no permitido'});
@@ -13,5 +28,5 @@ const match=(data.results||[]).find(m=>(clean(m.title)===clean(title)||clean(m.o
 return {title,year,rank:index+1,poster:match?.poster_path?'https://image.tmdb.org/t/p/w500'+match.poster_path:null,tmdbId:match?.id||null};
 }catch{return {title,year,rank:index+1,poster:null,tmdbId:null}}}));
 res.setHeader('Cache-Control','s-maxage=86400, stale-while-revalidate=86400');
-return res.status(200).json({updated:'2026-11-16',status:'Predicciones de la temporada, no nominaciones oficiales',films:result,sources:[{name:'The Ankler — Prestige Junkie Pundits (13 nov)',url:'https://anklerpundits.com/'},{name:'The Playlist — Predicciones mejor película',url:'https://theplaylist.net/best-picture-oscars-2027-contenders-predictions-the-odyssey-la-bola-negra-wild-horse-nine-top-the-field-20261021/'},{name:'TheWrap — Carrera tras festivales',url:'https://www.thewrap.com/creative-content/movies/best-picture-oscar-predictions-2027-after-festivals/'},{name:'Academia — Calendario oficial',url:'https://press.oscars.org/news/academy-and-abc-announce-show-dates-99th-and-100th-oscarsr'}]})
+return res.status(200).json({updated:'2026-11-23',status:'Predicciones de la temporada, no nominaciones oficiales',films:result,sources:[{name:'For The Win / USA Today — Pronósticos del 19 de noviembre',url:'https://ftw.usatoday.com/'},{name:'AwardsWatch — Mejor actor (20 nov)',url:'https://awardswatch.com/2027-oscar-predictions-best-actor-november/'},{name:'Academia — Calendario oficial',url:'https://www.oscars.org/es/99th-oscars-and-academy-key-dates'}]})
 }
